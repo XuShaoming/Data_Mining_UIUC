@@ -30,7 +30,7 @@ var margin = {top: 30, right: 20, bottom: 30, left: 50},
     height = 270 - margin.top - margin.bottom;
 
 // Parse the date / time
-var parseDate = d3.timeParse("%d-%B-%Y");
+var parseDate = d3.timeParse("%d-%b-%y");
 
 // Set the ranges
 var x = d3.scaleTime().range([0, width]);
@@ -55,7 +55,7 @@ var svg = d3.select("body")
               "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-d3.csv("data.csv", function(error, data) {
+d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Data_Visualization/Examples/SimpledGraph/data.csv", function(error, data) {
     data.forEach(function(d) {
         d.date = parseDate(d.date);
         d.close = +d.close;
@@ -81,7 +81,6 @@ d3.csv("data.csv", function(error, data) {
         .attr("class", "y axis")
         .call(yAxis);
 });
-
 
 </script>
 </body>
