@@ -22,7 +22,7 @@ path {
 <body>
 
 <!-- load the d3.js library -->    
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v4.min.js"></script>
 
 <script>
 
@@ -32,21 +32,19 @@ var margin = {top: 30, right: 20, bottom: 30, left: 50},
     height = 270 - margin.top - margin.bottom;
 
 // Parse the date / time
-var parseDate = d3.time.format("%b %Y").parse; 
+var parseDate = d3.timeParse("%b %Y");
 
 // Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
+var x = d3.scaleTime().range([0,width]);
+var y = d3.scaleLinear().range([height, 0]);
 
 // Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
 
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
+var xAxis = d3.axisBottom().scale(x).ticks(5);
+var yAxis = d3.axisLeft().scale(y).ticks(5);
 
 // Define the line
-var priceline = d3.svg.line()
+var priceline = d3.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.price); });
     
@@ -60,7 +58,7 @@ var svg = d3.select("body")
               "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-d3.csv("stocks.csv", function(error, data) {
+d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Data_Visualization/Examples/MultiLineGraph/stocks.csv", function(error, data) {
     data.forEach(function(d) {
 		d.date = parseDate(d.date);
 		d.price = +d.price;
