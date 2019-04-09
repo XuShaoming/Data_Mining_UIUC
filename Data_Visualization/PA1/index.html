@@ -38,7 +38,8 @@ var margin = {top: 30, right: 20, bottom: 70, left: 50},
     height = 300 - margin.top - margin.bottom;  
 
 // Parse the date / time
-var parseDate = d3.timeParse("%b %Y");
+/*change here*/
+var parseDate = d3.timeParse("%Y");
 
 // Set the ranges
 var x = d3.scaleTime().range([0,width]);
@@ -46,13 +47,14 @@ var y = d3.scaleLinear().range([0, height]);
 
 // Define the axes
 
-var xAxis = d3.axisBottom().scale(x).ticks(5);
-var yAxis = d3.axisLeft().scale(y).ticks(5);
+var xAxis = d3.axisBottom().scale(x).ticks(20);
+var yAxis = d3.axisLeft().scale(y).ticks(20);
 
 // Define the line
-var priceline = d3.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.price); });
+/*here defeine the line. we can try ONE lines first*/
+var GlobLine = d3.line()
+    .x(function(d) { return x(d.Year); })
+    .y(function(d) { return y(d.Glob); });
     
 // Adds the svg canvas
 var svg = d3.select("body")
@@ -66,8 +68,8 @@ var svg = d3.select("body")
 // Get the data
 d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Data_Visualization/Examples/MultiLineGraph/stocks.csv", function(error, data) {
     data.forEach(function(d) {
-		d.date = parseDate(d.date);
-		d.price = +d.price;
+        d.date = parseDate(d.date);
+        d.price = +d.price;
     });
 
     // Scale the range of the data
@@ -127,12 +129,3 @@ d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Dat
 
 </script>
 </body>
-
-
-
-
-
-
-
-
-
