@@ -19,7 +19,7 @@ path {
     shape-rendering: crispEdges;
 }
 
-.legend {
+.lable {
     font-size: 16px;
     font-weight: bold;
     text-anchor: middle;
@@ -78,28 +78,74 @@ path {
             x.domain(d3.extent(data, function(d) { return d.Year;}));
             y.domain([-100, 100]);
 
-            // Loop through each symbol / key
-
             svg.append("path")
                     .attr("class", "line")
                     .attr('stroke', d3.schemeCategory10[0])
+                    .attr("id", 'tagGlob')
                     .attr("d", Globline(data)); 
 
             svg.append("path")
                     .attr("class", "line")
                     .attr('stroke', d3.schemeCategory10[1])
+                    .attr("id", 'tagNHem')
                     .attr("d", NHemline(data)); 
 
             svg.append("path")
                     .attr("class", "line")
                     .attr('stroke', d3.schemeCategory10[2])
+                    .attr("id", 'tagSHem')
                     .attr("d", SHemline(data));
 
+            legendSpace = width/3; // spacing for legend //
+            var active_Glob = false;
+            var active_NHem = false;
+            var active_SHem = false;
+
             svg.append("text")
-                .attr("x", (width/2))
+                .attr("x", (legendSpace/2))
                 .attr("y", height+(margin.bottom/2))
                 .attr("class", "lable")
-                .text("Year");
+                .style("fill", d3.schemeCategory10[0])
+                .on("click", function(){
+                    var active = active_Glob ? false : true,
+                    newOpacity = active? 0 : 1;
+                    d3.select("#tagGlob")
+                        .transition().duration(100)
+                        .style("opacity", newOpacity);
+                    active_Glob = active;
+                })
+                .text("Glob");
+
+            svg.append("text")
+                .attr("x", legendSpace/2+1*legendSpace)
+                .attr("y", height+(margin.bottom/2))
+                .attr("class", "lable")
+                .style("fill", d3.schemeCategory10[1])
+                .on("click", function(){
+                    var active = active_NHem? false : true,
+                    newOpacity = active? 0 : 1;
+                    d3.select("#tagNHem")
+                        .transition().duration(100)
+                        .style("opacity", newOpacity);
+                    active_NHem = active;
+                })
+                .text("NHem");
+
+
+            svg.append("text")
+                .attr("x", legendSpace/2+2*legendSpace)
+                .attr("y", height+(margin.bottom/2))
+                .attr("class", "lable")
+                .style("fill", d3.schemeCategory10[2])
+                .on("click", function(){
+                    var active = active_SHem? false : true,
+                    newOpacity = active? 0 : 1;
+                    d3.select("#tagSHem")
+                        .transition().duration(100)
+                        .style("opacity", newOpacity);
+                    active_SHem = active;
+                })
+                .text("SHem");
 
             svg.append("text")
                 .attr("x", -margin.left / 2)
@@ -122,8 +168,5 @@ path {
 
     </script>
 </body>
-
-
-
 
 
