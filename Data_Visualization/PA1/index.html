@@ -5,12 +5,13 @@
 body { font: 12px Arial;}
 
 path { 
-    stroke: steelblue;
+    /*stroke: steelblue;*/
     stroke-width: 2;
     fill: none;
 }
 
 .axis path,
+
 .axis line {
     fill: none;
     stroke: grey;
@@ -25,107 +26,104 @@ path {
 } 
 
 </style>
+
 <body>
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script>
 
-<!-- load the d3.js library -->    
-<script src="http://d3js.org/d3.v4.min.js"></script>
+        // Set the dimensions of the canvas / graph
+        var margin = {top: 30, right: 20, bottom: 70, left: 50}, 
+            width = 600 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+        // Parse the date / time
+        var parseDate = d3.timeParse("%Y");
+        // Set the ranges
+        var x = d3.scaleTime().range([0,width]);
+        var y = d3.scaleLinear().range([height, 0]);
+        // Define the axes
+        var xAxis = d3.axisBottom().scale(x).ticks(5);
+        var yAxis = d3.axisLeft().scale(y).ticks(5);
 
-<script>
+        // Define the line
+        /*only define the glob line now*/
+        var Globline = d3.line()
+            .x(function(d) { return x(d.Year); })
+            .y(function(d) { return y(d.Glob); });
 
-// Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 20, bottom: 70, left: 50}, 
-    width = 600 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;  
+        var NHemline = d3.line()
+            .x(function(d) { return x(d.Year); })
+            .y(function(d) { return y(d.NHem); });
 
-// Parse the date / time
-/*change here*/
-var parseDate = d3.timeParse("%Y");
+        var SHemline = d3.line()
+            .x(function(d) { return x(d.Year); })
+            .y(function(d) { return y(d.SHem); });
 
-// Set the ranges
-var x = d3.scaleTime().range([0,width]);
-var y = d3.scaleLinear().range([0, height]);
+        // Adds the svg canvas
+        var svg = d3.select("body")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", 
+                      "translate(" + margin.left + "," + margin.top + ")");
 
-// Define the axes
 
-var xAxis = d3.axisBottom().scale(x).ticks(20);
-var yAxis = d3.axisLeft().scale(y).ticks(20);
+        d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Data_Visualization/PA1/data/ExcelFormattedGISTEMPData2CSV.csv", function(error, data) {
+            data.forEach(function(d) {
+                d.Year = parseDate(d.Year);
+            });
 
-// Define the line
-/*here defeine the line. we can try ONE lines first*/
-var GlobLine = d3.line()
-    .x(function(d) { return x(d.Year); })
-    .y(function(d) { return y(d.Glob); });
-    
-// Adds the svg canvas
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
 
-// Get the data
-d3.csv("https://raw.githubusercontent.com/XuShaoming/Data_Mining_UIUC/master/Data_Visualization/Examples/MultiLineGraph/stocks.csv", function(error, data) {
-    data.forEach(function(d) {
-        d.date = parseDate(d.date);
-        d.price = +d.price;
-    });
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d.Year;}));
+            y.domain([-100, 100]);
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.price; })]); 
+            // Loop through each symbol / key
 
-    // Nest the entries by symbol
-    var dataNest = d3.nest()
-        .key(function(d) {return d.symbol;})
-        .entries(data);
+            svg.append("path")
+                    .attr("class", "line")
+                    .attr('stroke', d3.schemeCategory10[0])
+                    .attr("d", Globline(data)); 
 
-    // Loop through each symbol / key
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+            svg.append("path")
+                    .attr("class", "line")
+                    .attr('stroke', d3.schemeCategory10[1])
+                    .attr("d", NHemline(data)); 
 
-    legendSpace = width/dataNest.length; // spacing for legend // 
+            svg.append("path")
+                    .attr("class", "line")
+                    .attr('stroke', d3.schemeCategory10[2])
+                    .attr("d", SHemline(data));
 
-    dataNest.forEach(function(d, i) {
+            svg.append("text")
+                .attr("x", (width/2))
+                .attr("y", height+(margin.bottom/2))
+                .attr("class", "lable")
+                .text("Year");
 
-        svg.append("path")
-            .attr("class", "line")
-            .style("stroke", function(){
-                return d.color = color(d.key);
-            })
-            .attr("id", 'tag'+d.key.replace(/\s+/g, ''))
-            .attr("d", priceline(d.values)); 
+            svg.append("text")
+                .attr("x", -margin.left / 2)
+                .attr("y", height/2)
+                .attr("class", "lable")
+                .style("writing-mode", "tb")
+                .text("Deviation");
 
-        svg.append("text")
-            .attr("x", (legendSpace/2)+i*legendSpace)
-            .attr("y", height+(margin.bottom/2)+5)
-            .attr("class", "legend")
-            .style("fill", function() {
-                return d.color = color(d.key); })
-            .on("click", function(){
-                var active = d.active ? false : true,
-                newOpacity = active? 0 : 1;
-                d3.select("#tag"+d.key.replace(/\s+/g, ''))
-                    .transition().duration(100)
-                    .style("opacity", newOpacity);
-                d.active = active;
-            })
-            .text(d.key);
+            // Add the X Axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
 
-    });
+            // Add the Y Axis
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+        });
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-
-});
-
-</script>
+    </script>
 </body>
+
+
+
+
+

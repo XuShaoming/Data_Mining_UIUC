@@ -42,7 +42,7 @@ var parseDate = d3.timeParse("%b %Y");
 
 // Set the ranges
 var x = d3.scaleTime().range([0,width]);
-var y = d3.scaleLinear().range([0, height]);
+var y = d3.scaleLinear().range([height, 0]);
 
 // Define the axes
 
